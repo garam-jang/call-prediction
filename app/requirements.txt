@@ -4,10 +4,5 @@ numpy
 scikit-learn
 catboost
 joblib
-plotly.express
-json
-matplotlib.pyplo
-datetime
-timedelta
-BaseEstimator
-TransformerMixin
+plotly
+matplotlib
