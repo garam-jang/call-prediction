@@ -110,10 +110,22 @@ date_range = st.radio("원하는 기간을 선택하세요.", options=["1주일"
 # 기간 설정
 days = 7 if date_range == "1주일" else 30
 selected_date = pd.to_datetime(selected_date)
-start_date = pd.to_datetime(selected_date - timedelta(days=days))
-trend_data = data[(data["tm"] >= start_date) & (data["tm"] <= selected_date) & (data["address_gu"] == selected_gu)]
+start_date = selected_date - timedelta(days=days)
 
-if trend_data.empty:
+trend_data = data[
+    (data["tm"] >= start_date) & (data["tm"] <= selected_date) & (data["address_gu"] == selected_gu)
+].copy()
+
+# 날짜 단위로 평균값 집계
+trend_data["date"] = trend_data["tm"].dt.date  # 날짜만 추출
+daily_avg = trend_data.groupby("date").agg({
+    "ta_avg": "mean",
+    "rn_day": "mean",
+    "hm_avg": "mean",
+    "ws_max": "mean"
+}).reset_index()
+
+if daily_avg.empty:
     st.warning("해당 기간에 데이터가 없습니다.")
 else:
     st.subheader(f"📊 {selected_gu} 최근 {date_range} 기상 지표 변화 추이")
@@ -122,32 +134,33 @@ else:
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-        fig1 = px.line(trend_data, x='tm', y='ta_avg', markers=True,
-                       labels={'tm': '날짜', 'ta_avg': '평균 기온 (℃)'},
+        fig1 = px.line(daily_avg, x='date', y='ta_avg', markers=True,
+                       labels={'date': '날짜', 'ta_avg': '평균 기온 (℃)'},
                        color_discrete_sequence=['#1E88E5'])
         fig1.update_layout(height=250, margin=dict(t=30, b=30), xaxis_title=None)
         st.plotly_chart(fig1, use_container_width=True)
 
     with col2:
-        fig2 = px.line(trend_data, x='tm', y='rn_day', markers=True,
-                       labels={'tm': '날짜', 'rn_day': '강수량 (mm)'},
+        fig2 = px.line(daily_avg, x='date', y='rn_day', markers=True,
+                       labels={'date': '날짜', 'rn_day': '강수량 (mm)'},
                        color_discrete_sequence=['#F4511E'])
         fig2.update_layout(height=250, margin=dict(t=30, b=30), xaxis_title=None)
         st.plotly_chart(fig2, use_container_width=True)
 
     with col3:
-        fig3 = px.line(trend_data, x='tm', y='hm_avg', markers=True,
-                       labels={'tm': '날짜', 'hm_avg': '평균 습도 (%)'},
+        fig3 = px.line(daily_avg, x='date', y='hm_avg', markers=True,
+                       labels={'date': '날짜', 'hm_avg': '평균 습도 (%)'},
                        color_discrete_sequence=['#43A047'])
         fig3.update_layout(height=250, margin=dict(t=30, b=30), xaxis_title=None)
         st.plotly_chart(fig3, use_container_width=True)
 
     with col4:
-        fig4 = px.line(trend_data, x='tm', y='ws_max', markers=True,
-                       labels={'tm': '날짜', 'ws_max': '최대 풍속 (m/s)'},
+        fig4 = px.line(daily_avg, x='date', y='ws_max', markers=True,
+                       labels={'date': '날짜', 'ws_max': '최대 풍속 (m/s)'},
                        color_discrete_sequence=['#8E24AA'])
         fig4.update_layout(height=250, margin=dict(t=30, b=30), xaxis_title=None)
         st.plotly_chart(fig4, use_container_width=True)
+
 
 # ─────────────────────────────────────────────────────────────
 # 신고건수 예측
