@@ -1,7 +1,11 @@
 import streamlit as st
 import streamlit as st
 
-st.set_page_config(page_title="LOGIS:COPE", page_icon="🏠", layout="wide")
+st.set_page_config(
+    page_title="119 신고 현황 대시보드",
+    page_icon="🚨",
+    layout="wide"
+)
 
 # CSS
 st.markdown("""
