@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 import joblib
 from sklearn.base import BaseEstimator, TransformerMixin
+import os
 
 
 
@@ -54,13 +55,9 @@ class FeatureEngineer(BaseEstimator, TransformerMixin):
         return X.drop(columns=['tm'])
 
 # 데이터 로드
-@st.cache_data
-def load_data():
-    df = pd.read_csv("../train.csv", encoding="euc-kr", parse_dates=["tm"])
-    df["address_gu"] = df["address_gu"].str.strip()
-    return df
-
-data = load_data()
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))  # 한 단계 위로
+data_path = os.path.join(BASE_DIR, "train.csv")
+data = pd.read_csv(data_path)
 
 # 파생변수
 data["ta_avg"] = (data["ta_min"] + data["ta_max"]) / 2
