@@ -56,7 +56,7 @@ class FeatureEngineer(BaseEstimator, TransformerMixin):
 # 데이터 로드
 @st.cache_data
 def load_data():
-    df = pd.read_csv("train.csv", encoding="euc-kr", parse_dates=["tm"])
+    df = pd.read_csv("../train.csv", encoding="euc-kr", parse_dates=["tm"])
     df["address_gu"] = df["address_gu"].str.strip()
     return df
 
@@ -158,7 +158,7 @@ st.subheader("🚨 신고건수 예측")
 # 모델 불러오기
 @st.cache_resource
 def load_model():
-    return joblib.load("model_pipeline.pkl")
+    return joblib.load("../model_pipeline.pkl")
 
 model = load_model()
 
